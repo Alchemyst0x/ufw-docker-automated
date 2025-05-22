@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/patrickmn/go-cache"
 	"github.com/rs/zerolog/log"
 	"github.com/shinebayar-g/ufw-docker-automated/logger"
@@ -17,7 +17,7 @@ func main() {
 	} else {
 		log.Info().Msg("ufw-docker-automated: Connected to the Docker Engine.")
 	}
-	createChannel := make(chan *types.ContainerJSON)
+	createChannel := make(chan *container.InspectResponse)
 	deleteChannel := make(chan string)
 	trackedContainers := cache.New(cache.NoExpiration, 0)
 

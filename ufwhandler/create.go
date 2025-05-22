@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/patrickmn/go-cache"
 	"github.com/rs/zerolog/log"
 )
@@ -22,7 +22,7 @@ func checkCIDR(cidr string) bool {
 	return err == nil
 }
 
-func CreateUfwRule(ch <-chan *types.ContainerJSON, c *cache.Cache) {
+func CreateUfwRule(ch <-chan *container.InspectResponse, c *cache.Cache) {
 	for container := range ch {
 		containerName := strings.Replace(container.Name, "/", "", 1) // container name appears with prefix "/"
 		containerID := container.ID[:12]
@@ -116,9 +116,9 @@ func CreateUfwRule(ch <-chan *types.ContainerJSON, c *cache.Cache) {
 
 			if container.Config.Labels["UFW_ALLOW_TO"] != "" {
 				ufwRules := []UfwRule{}
-				ufwAllowToLabelParsed := strings.Split(container.Config.Labels["UFW_ALLOW_TO"], ";")
+				ufwAllowToLabelParsed := strings.SplitSeq(container.Config.Labels["UFW_ALLOW_TO"], ";")
 
-				for _, allowTo := range ufwAllowToLabelParsed {
+				for allowTo := range ufwAllowToLabelParsed {
 					ip := strings.Split(allowTo, "-")
 
 					// First element should be always valid IP Address or CIDR
